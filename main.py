@@ -39,7 +39,8 @@ def file_reader(file_path) -> list:
         dictionary = {}
         dictionary['number'] = text[i]
         dictionary['type'] = text[i+1]
-        dictionary['question'] = [text[i+2], text[i+3], text[i+4], text[i+5], text[i+6]]
+        dictionary['question'] = text[i+2]
+        dictionary['variants'] = [text[i+3], text[i+4], text[i+5], text[i+6]]
         dictionary['correct answer'] = text[i+7]
         dictionary['score'] = text[i+8]
         dictionary['tries'] = text[i+9]
@@ -48,6 +49,21 @@ def file_reader(file_path) -> list:
     r.shuffle(dictionaries)
     return dictionaries
 
+def questioner(dictionaries):
+    player_score = 0
+    player_name = input(Color.BOLD +'Добро пожаловать в нашу викторину по Python! Пожалуйства, введите ваше имя: ' + Color.END)
+    for question in dictionaries:
+        print(Color.DARKCYAN + Color.UNDERLINE + 'Вопрос первый' + Color.END)
+        print(Color.DARKCYAN + question['question'][0] + Color.END)
+        if question['type'] == 's':
+            print('Вопрос с 1 вариантом ответа')
+        else:
+            print('Доступно несколько вариантов ответа: ')
+        for parts in question['variants']:
+            print(*parts)
+        answer = input(Color.DARKCYAN + Color.UNDERLINE + 'Ваш ответ: ' + Color.END)
+    return f'Викторина окончена'
 
 
-pprint(file_reader('questions.txt'))
+# pprint(file_reader('questions.txt'))
+questioner(file_reader('questions.txt'))
