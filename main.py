@@ -33,7 +33,7 @@ def file_reader(file_path) -> list:
     dictionaries = []
     text = []
     for line in file.read().splitlines():
-        text.append(line.split('\n'))
+        text.append(line)
     i = 0
     while i < len(text):
         dictionary = {}
@@ -41,7 +41,7 @@ def file_reader(file_path) -> list:
         dictionary['type'] = text[i+1]
         dictionary['question'] = text[i+2]
         dictionary['variants'] = [text[i+3], text[i+4], text[i+5], text[i+6]]
-        dictionary['correct answer'] = text[i+7]
+        dictionary['answer'] = text[i+7]
         dictionary['score'] = text[i+8]
         dictionary['tries'] = text[i+9]
         dictionaries.append(dictionary)
@@ -53,17 +53,39 @@ def questioner(dictionaries):
     player_score = 0
     player_name = input(Color.BOLD +'Добро пожаловать в нашу викторину по Python! Пожалуйства, введите ваше имя: ' + Color.END)
     for question in dictionaries:
-        print(Color.DARKCYAN + Color.UNDERLINE + 'Вопрос первый' + Color.END)
-        print(Color.DARKCYAN + question['question'][0] + Color.END)
-        if question['type'] == 's':
-            print('Вопрос с 1 вариантом ответа')
+        player_score += asker(question)
+
+
+    return f'Викторина окончена', player_score, player_name
+
+def asker(question):
+    score = int(question['score'])
+    tries = int(question['tries'])
+    question_printer(question)
+    while True:
+        answer = input(Color.DARKCYAN + 'Ваш ответ: ' + Color.END)
+        if set(answer) == set(question['answer']):
+            print(Color.GREEN + 'Поздравляю, вы абсолютно правы!' + Color.END)
+            return score
+        elif tries == 1:
+            print(Color.RED + Color.BOLD + f'К сожалению, вы так и не дали правильного ответа.\nВаши попытки кончились.' + Color.END)
+            return 0
         else:
-            print('Доступно несколько вариантов ответа: ')
-        for parts in question['variants']:
-            print(*parts)
-        answer = input(Color.DARKCYAN + Color.UNDERLINE + 'Ваш ответ: ' + Color.END)
-    return f'Викторина окончена'
+            tries -= 1
+            print(Color.YELLOW + 'Вы неправы' + Color.RED + '!!!' + Color.END, f'\nПопробуйте еще раз')
+            question_printer(question)
+            score -= 1
+
+def question_printer(question):
+    print(Color.DARKCYAN + Color.UNDERLINE + Color.BOLD + question['question'] + Color.END)
+    if question['type'] == 'S':
+        print(Color.DARKCYAN + 'Вопрос с одним вариантом ответа:' + Color.END)
+    else:
+        print(Color.DARKCYAN + 'Доступно несколько вариантов ответа:' + Color.END)
+    for parts in question['variants']:
+        print(parts)
+    return True
 
 
 # pprint(file_reader('questions.txt'))
-questioner(file_reader('questions.txt'))
+print(questioner(file_reader('questions.txt')))
