@@ -1,3 +1,6 @@
+import random as r
+from pprint import pprint
+
 class Color:
     DARKCYAN = '\033[36m'
     BLUE = '\033[94m'
@@ -21,11 +24,12 @@ def file_reader(file_path) -> list:
     - количество попыток при ответе на вопрос
     Алгоритм построен так, что после преобразования файла в список начинает читать его по индексу i+n, где n -
     добавочное число для более легкого добавления в словрь, после того, как добавлены все значеня словаря к i добавляется
-    число 11, чтобы перейти к чтению следующего вопроса
+    число 11, чтобы перейти к чтению следующего вопроса.
+    В конце функция перемешивает вопросы, чтобы в будущем те шли  у людей в рандомном порядке
     :param file_path:
-    :return: list
+    :returnsw as:
     '''
-    file = (open(file_path, 'r',))
+    file = open(file_path, 'r',)
     dictionaries = []
     text = []
     for line in file.read().splitlines():
@@ -41,7 +45,9 @@ def file_reader(file_path) -> list:
         dictionary['tries'] = text[i+9]
         dictionaries.append(dictionary)
         i += 11
+    r.shuffle(dictionaries)
     return dictionaries
 
 
-print(file_reader('questions.txt'))
+
+pprint(file_reader('questions.txt'))
