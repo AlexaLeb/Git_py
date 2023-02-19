@@ -29,27 +29,27 @@ def file_reader(file_path) -> list:
     :param file_path:
     :returnsw as:
     """
-    file = open(file_path, 'r',)
+    file = open(file_path, 'r', encoding='UTF-8')
     dictionaries = []
     text = []
     for line in file.read().splitlines():
         text.append(line)
-    i = 0
-    while i < len(text):
+    question_string_step = 0
+    while question_string_step < len(text):
         dictionary = {}
-        dictionary['number'] = text[i]
-        dictionary['type'] = text[i+1]
-        dictionary['question'] = text[i+2]
-        dictionary['variants'] = [text[i+3], text[i+4], text[i+5], text[i+6]]
-        dictionary['answer'] = text[i+7]
-        dictionary['score'] = text[i+8]
-        dictionary['tries'] = text[i+9]
+        dictionary['number'] = text[question_string_step]
+        dictionary['type'] = text[question_string_step + 1]
+        dictionary['question'] = text[question_string_step + 2]
+        dictionary['variants'] = [text[question_string_step + 3], text[question_string_step + 4], text[question_string_step + 5], text[question_string_step + 6]]
+        dictionary['answer'] = text[question_string_step + 7]
+        dictionary['score'] = text[question_string_step + 8]
+        dictionary['tries'] = text[question_string_step + 9]
         dictionaries.append(dictionary)
-        i += 11
+        question_string_step += 11
     r.shuffle(dictionaries)
     return dictionaries
 
-def questioner(dictionaries):
+def questioner(dictionaries: dict):
     player_score = 0
     overall = {}
     print(Color.BLUE + Color.BOLD + 'Добро пожаловать в нашу викторину по Python! Хочешь принять учаситие и опробовать свои силы?')
@@ -70,13 +70,16 @@ def questioner(dictionaries):
         dict_with_aswr = {
             'question': question['variants'],
             'answer of player': answer,
-            'right answer': question['answer']
+            'right answer': question['answer'],
+            'score': ask[0]
         }
         overall[f'question number {counter}'] = dict_with_aswr
     overall['overall score'] = player_score
-    return f'Викторина окончена', overall
+    overall['question amount'] = counter
+    writer(overall)
+    return f'Викторина окончена'
 
-def asker(question):
+def asker(question: dict):
     score = int(question['score'])
     tries = int(question['tries'])
     question_printer(question)
@@ -94,7 +97,7 @@ def asker(question):
             question_printer(question)
             score -= 1
 
-def question_printer(question):
+def question_printer(question: dict):
     print(Color.DARKCYAN + Color.UNDERLINE + Color.BOLD + question['question'] + Color.END)
     if question['type'] == 'S':
         print(Color.DARKCYAN + 'Вопрос с одним вариантом ответа:' + Color.END)
@@ -103,6 +106,32 @@ def question_printer(question):
     for parts in question['variants']:
         print(parts)
     return True
+
+def writer(dictionary: dict):
+    with open(dictionary['name'] + '.txt', 'w', encoding='UTF-8') as file:
+        print('Квиз прошел -',dictionary['name'], file=file)
+        for question_id in range(1, int(dictionary['question amount'] + 1)):
+            print(f'Вопрос номер {question_id}', file=file)
+            question = dictionary[f'question number {question_id}']
+            for text_id in range(0, len(question['question'])):
+                print(question['question'][text_id], file=file)
+            print('Ваш ответ:', question['answer of player'], file=file)
+            if question['answer of player'] == question['right answer']:
+                print('Ваш ответ верный!', file=file)
+            else:
+                print('Ваш ответ неверный!', file=file)
+            print('Правильный ответ:', question['right answer'], 'За него вы получаете', question['score'], 'баллов', file=file)
+        print('Итог:yt')
+        if dictionary['overall score'] > 8:
+            print(Color.GREEN + 'Молодец, отличный результат!' + Color.END)
+            print('Молодец, отличный результат!', file=file)
+        elif dictionary['overall score'] > 5:
+            print(Color.YELLOW + 'Нуууу, экзамен ты на "зачет" сдашь' + Color.END)
+            print('Нуууу, экзамен ты на "зачет" сдашь', file=file)
+        else:
+            print(Color.RED + 'Беги готовиться! ТЫ ничего не знаешь' + Color.END)
+            print('Беги готовиться! ТЫ ничего не знаешь', file=file)
+    file.close()
 
 
 # pprint(file_reader('questions.txt'))
